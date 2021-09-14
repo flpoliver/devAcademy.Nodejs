@@ -10,7 +10,7 @@ module.exports = {
       }
 
       return a.id > b.id ? 1 : -1;
-      
+
     });
 
     res.send(200, sortedUsers);
@@ -29,24 +29,16 @@ module.exports = {
   },
 
   createUser(req, res) {
-    let body = '';
+    const { body } = req;
+    const lastUserId = users[users.length - 1].id;
 
-    req.on('data', (chunk) => {
-      body += chunk;
-    });
+    const newUser = {
+      id: lastUserId + 1,
+      name: body.name,
+    };
 
-    req.on('end', () => {
-      body = JSON.parse(body);
+    users.push(newUser);
 
-      const lastUserId = users[users.length - 1].id;
-      const newUser = {
-        id: lastUserId + 1,
-        name: body.name,
-      };
-
-      users.push(newUser);
-
-      res.send(200, newUser);
-    });
+    res.send(200, newUser);
   },
 };
