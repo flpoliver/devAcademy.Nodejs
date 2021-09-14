@@ -6,16 +6,25 @@ const routes = require('./routes');
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(`http://localhost:3000${req.url}`);
 
-  console.log(parsedUrl);
+  let { pathname } = parsedUrl;
+  let id = null;
 
-  console.log(`Request method: ${req.method} | Endpoint: ${parsedUrl.pathname}`);
+  const sliptEndpoint = pathname.split('/').filter(Boolean);
+
+  if(sliptEndpoint.length > 1 ) {
+    pathname = `/${sliptEndpoint[0]}/:id`;
+    id = sliptEndpoint[1];
+  }
 
   const route = routes.find((routeObj) => (
-    routeObj.endpoint === parsedUrl.pathname && routeObj.method === req.method
+    routeObj.endpoint === pathname && routeObj.method === req.method
   ));
+
 
   if (route) {
     req.query = Object.fromEntries(parsedUrl.searchParams);
+    req.params = { id };
+
     route.handler(req, res);
   } else {
     res.writeHead(404, { 'Content-Type': 'text/html' });
